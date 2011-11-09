@@ -30,7 +30,9 @@ module Gild
     def array(array, options = {}, &b)
       name = Gild.gilded_name(options[:as] || array)
       render_context.current_hash[name] = [].tap do |objects|
-        array.each { |c| objects << constuct_object(c, {}, options, &b) }
+        array.each do |c|
+          objects << constuct_object(c, {}, options, &b) 
+        end
       end
     end
 
@@ -44,7 +46,7 @@ module Gild
     def constuct_object(context, hash, options, &b)
       render_context.push context, hash
       attributes(options[:attributes])
-      instance_eval &b if block_given?
+      instance_eval { b.call(context) } if block_given?
       render_context.pop[1]
     end
   end

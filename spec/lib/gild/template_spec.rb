@@ -1,3 +1,4 @@
+require 'spec_helper'
 require 'lib/gild'
 
 module Gild
@@ -58,7 +59,9 @@ describe Gild::Template do
     end
 
     it "executes the provided block in the context of the template" do
-      template.object(:test_object) { @executed_in = self }
+      template.instance_eval do
+        object(:test_object) { @executed_in = self }
+      end
       template.instance_variable_get(:"@executed_in").should == template
     end
   end
@@ -107,8 +110,10 @@ describe Gild::Template do
     end
 
     it "yields the given block once for each object in the array" do
-      template.array [test_object, test_object], :attributes => :foo do
-        @call_count = @call_count.to_i + 1
+      template.instance_eval do
+        array [Gild::Test::TestObject.new, Gild::Test::TestObject.new], :attributes => :foo do
+          @call_count = @call_count.to_i + 1
+        end
       end
       template.instance_variable_get("@call_count").should == 2
     end

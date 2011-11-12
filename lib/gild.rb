@@ -1,7 +1,6 @@
-require 'gild/render_context'
-require 'gild/builder'
-require 'gild/template'
 require 'gild/version'
+require 'gild/builder'
+require 'gild/render_context'
 
 module Gild
   def self.gilded_name(object)

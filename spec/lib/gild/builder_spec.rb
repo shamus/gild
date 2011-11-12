@@ -1,6 +1,5 @@
 require 'spec_helper'
 require 'lib/gild'
-require 'lib/gild/builder'
 
 module Gild
   module Test

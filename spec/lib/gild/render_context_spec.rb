@@ -1,4 +1,3 @@
-require 'spec_helper'
 require 'lib/gild'
 
 module Gild

@@ -9,15 +9,16 @@ module Gild
       @template_block = b
     end
 
-    def self.render(scope = Object.new)
+    def self.render(scope = Object.new, &b)
       helpers.each { |h| scope.extend h }
       template = Gild::RenderContext.new scope, initial_context, initial_hash
-      render_with_template template
+      render_with_template template, &b
     end
 
-    def self.render_with_template(template)
+    def self.render_with_template(template, &b)
       template.instance_eval @template_source unless @template_source.to_s.empty?
       template.instance_eval &@template_block if @template_block
+      template.instance_eval &b if block_given?
       template
     end
 

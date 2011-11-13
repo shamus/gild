@@ -1,5 +1,5 @@
 module Gild
-  class RenderContext
+  module RenderContext
     class Stack
       def push(object, hash = {})
         stack.push [object, hash]
@@ -22,16 +22,6 @@ module Gild
       def stack
         @stack ||= []
       end
-    end
-
-    attr_accessor :to_hash
-
-    def initialize(scope, context = nil, to_hash = {})
-      @scope = scope
-      @to_hash = to_hash
-      @stack = Stack.new.tap { |rc| rc.push context, @to_hash }
-
-      copy_instance_variables!
     end
 
     def object(context, options = {}, &b)
@@ -65,28 +55,25 @@ module Gild
       builder.render_with_template(self)
     end
 
+    def to_hash
+      stack.current_hash
+    end
+
     private
-    attr_reader :scope, :stack
+
+    def stack
+      @_stack ||= Stack.new.tap do |s| 
+        ih = respond_to?(:initial_hash) ? initial_hash : {}
+        ic = respond_to?(:initial_context) ? initial_context : nil 
+        s.push(ic, ih)
+      end
+    end
 
     def constuct_object(context, hash, options, &b)
       stack.push context, hash
       attributes(options[:attributes])
       instance_eval { b.call(context) } if block_given?
       stack.pop[1]
-    end
-
-    def copy_instance_variables!
-      scope.instance_variables.map(&:to_s).each do |name|
-        instance_variable_set(name, scope.instance_variable_get(name))
-      end
-    end
-
-    def respond_to?(name, include_private=false)
-      @scope.respond_to?(name, include_private) ? true : super
-    end
-
-    def method_missing(name, *args, &block)
-      @scope.respond_to?(name) ? @scope.send(name, *args, &block) : super
     end
   end
 end

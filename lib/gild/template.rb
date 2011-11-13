@@ -6,8 +6,6 @@ module Gild
     end
 
     def render(scope, locals={}, &b)
-      #TODO: locals
-      #TODO: what is this block??
       MultiJson.encode(builder.render(scope, &b).to_hash)
     end
 

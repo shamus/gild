@@ -29,7 +29,8 @@ describe Gild::RenderContext do
     end
 
     it "sets the specified instance variables" do
-      scope = { "@foo" => :foo, "@bar" => :bar }
+      scope = Object.new
+      scope.instance_eval { @foo = :foo; @bar = :bar }
       template = described_class.new(scope, Object.new)
       template.instance_variable_get("@foo").should == :foo
       template.instance_variable_get("@bar").should == :bar

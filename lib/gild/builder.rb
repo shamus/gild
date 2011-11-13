@@ -8,9 +8,9 @@ module Gild
       @template = b
     end
 
-    def self.render(scope = {})
+    def self.render(scope = Object.new)
+      helpers.each { |h| scope.extend h }
       template = Gild::RenderContext.new scope, initial_context, initial_hash
-      helpers.each { |h| template.extend h }
       render_with_template template
     end
 

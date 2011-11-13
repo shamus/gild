@@ -27,10 +27,11 @@ module Gild
     attr_accessor :to_hash
 
     def initialize(scope, context = nil, to_hash = {})
+      @scope = scope
       @to_hash = to_hash
       @stack = Stack.new.tap { |rc| rc.push context, @to_hash }
 
-      scope.each { |k,v| instance_variable_set(k, v) }
+      copy_instance_variables!
     end
 
     def object(context, options = {}, &b)
@@ -65,13 +66,27 @@ module Gild
     end
 
     private
-    attr_reader :stack
+    attr_reader :scope, :stack
 
     def constuct_object(context, hash, options, &b)
       stack.push context, hash
       attributes(options[:attributes])
       instance_eval { b.call(context) } if block_given?
       stack.pop[1]
+    end
+
+    def copy_instance_variables!
+      scope.instance_variables.map(&:to_s).each do |name|
+        instance_variable_set(name, scope.instance_variable_get(name))
+      end
+    end
+
+    def respond_to?(name, include_private=false)
+      @scope.respond_to?(name, include_private) ? true : super
+    end
+
+    def method_missing(name, *args, &block)
+      @scope.respond_to?(name) ? @scope.send(name, *args, &block) : super
     end
   end
 end

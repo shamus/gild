@@ -8,7 +8,9 @@ module Gild
 
     class TestBuilder < Gild::Builder
       helper Gild::Test::Helper
-      template { @evaluated_in = self }
+      template "@string_evaluated_in = self" do 
+        @block_evaluated_in = self
+      end
     end
   end
 end
@@ -21,6 +23,7 @@ describe Gild::Builder do
   end
 
   it "executes the template block in the context of the template class" do
-    @template.instance_variable_get(:"@evaluated_in").should == @template
+    @template.instance_variable_get(:"@string_evaluated_in").should == @template
+    @template.instance_variable_get(:"@block_evaluated_in").should == @template
   end
 end

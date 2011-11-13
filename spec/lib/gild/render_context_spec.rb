@@ -16,21 +16,21 @@ end
 describe Gild::RenderContext do
   let(:included_builder) { Gild::Test::IncludedBuilder }
   let(:test_object) { Gild::Test::TestObject.new }
-  let(:template) { described_class.new(test_object) }
+  let(:template) { described_class.new({}, test_object) }
 
   describe "creation" do
     it "defaults the json hash with an empty hash" do
-      described_class.new.to_hash.should == {}
+      described_class.new({}).to_hash.should == {}
     end
 
     it "accepts a custom value for the json hash" do
       supplied_hash = { "supplied" => true }
-      described_class.new(Object.new, {}, supplied_hash).to_hash.should == supplied_hash
+      described_class.new({}, Object.new, supplied_hash).to_hash.should == supplied_hash
     end
 
     it "sets the specified instance variables" do
       scope = { "@foo" => :foo, "@bar" => :bar }
-      template = described_class.new(Object.new, scope)
+      template = described_class.new(scope, Object.new)
       template.instance_variable_get("@foo").should == :foo
       template.instance_variable_get("@bar").should == :bar
     end

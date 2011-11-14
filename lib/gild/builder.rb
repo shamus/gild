@@ -4,30 +4,19 @@ module Gild
       helpers << helper
     end
 
-    def self.template(source = nil, &b)
-      @template_source = source
+    def self.template(&b)
       @template_block = b
     end
 
-    def self.render(scope = Object.new, &b)
+    def self.render(scope = Object.new)
       scope.extend Gild::RenderContext
       helpers.each { |h| scope.extend h }
-      render_with_template scope, &b
+      render_with_template scope
     end
 
-    def self.render_with_template(template, &b)
-      template.instance_eval @template_source unless @template_source.to_s.empty?
+    def self.render_with_template(template)
       template.instance_eval &@template_block if @template_block
-      template.instance_eval &b if block_given?
       template
-    end
-
-    def self.initial_context
-      nil
-    end
-
-    def self.initial_hash
-      {}
     end
 
     private

@@ -133,7 +133,7 @@ describe Gild::RenderContext do
 
   describe "including another builder" do
     it "executes the builder's template block in the context of this template" do
-      execute_template_in_scope(scope) { render(Gild::Test::IncludedBuilder) }
+      execute_template_in_scope(scope) { include(Gild::Test::IncludedBuilder) }
       scope.instance_variable_get(:"@evaluated_in").should == scope
     end
   end

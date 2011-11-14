@@ -24,6 +24,8 @@ module Gild
       end
     end
 
+    attr_accessor :local_assigns
+
     def object(context, options = {}, &b)
       name = Gild.gilded_name(options[:as] || context)
       stack.current_hash[name] = constuct_object(context, {}, options, &b)
@@ -51,7 +53,7 @@ module Gild
       end
     end
 
-    def render(builder)
+    def include(builder)
       builder.render_with_template(self)
     end
 

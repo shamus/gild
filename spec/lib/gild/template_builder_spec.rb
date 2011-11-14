@@ -7,17 +7,15 @@ module Gild
       def im_helping!; end
     end
 
-    class TestBuilder < Gild::Builder
+    class TestTemplateBuilder < Gild::TemplateBuilder
       helper Gild::Test::Helper
-      template do 
-        @block_evaluated_in = self
-      end
+      template "@block_evaluated_in = self"
     end
   end
 end
 
-describe Gild::Builder do
-  before { @template = Gild::Test::TestBuilder.render Object.new }
+describe Gild::TemplateBuilder do
+  before { @template = Gild::Test::TestTemplateBuilder.render Object.new }
 
   it "extends the template class with the supplied helpers" do
     @template.should respond_to(:im_helping!)

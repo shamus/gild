@@ -1,6 +1,7 @@
 require 'gild/builder'
 require 'gild/render_context'
 require 'gild/template'
+require 'gild/template_builder'
 require 'gild/version'
 
 require 'extensions/string.rb'

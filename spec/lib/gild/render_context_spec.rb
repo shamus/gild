@@ -4,8 +4,10 @@ require 'lib/gild'
 module Gild
   module Test
     class TestObject
-      def foo; :foo; end
-      def bar; :bar; end
+      def foo; :foo end
+      def bar; :bar end
+      def qux; 'qux' end
+      def bazzes; [:baz] end
     end
 
     class IncludedBuilder < Gild::Builder
@@ -33,29 +35,26 @@ describe Gild::RenderContext do
 
     it "accepts a custom value for the initial hash" do
       def scope.initial_hash
-        { :supplied => true }
+        {:supplied => true}
       end
-      scope.to_hash.should == { :supplied => true }
+
+      scope.to_hash.should == {:supplied => true}
     end
 
     it "accepts a custom value for the initial object" do
       execute_template_in_scope(scope_with_initial_context) { attributes [:foo, :bar] }
-      scope.to_hash.should == { 'foo' => :foo, 'bar' => :bar }
+      scope.to_hash.should == {'foo' => :foo, 'bar' => :bar}
     end
   end
 
   describe "rendering an object" do
-    it "accepts a symbol as the name of the object" do
-      execute_template_in_scope(scope) { object :symbol }
-      scope.to_hash.should have_key('symbol')
-    end
 
     it "derives the object name from the object type" do
       execute_template_in_scope(scope) { object Gild::Test::TestObject.new }
       scope.to_hash.should have_key('test_object')
     end
 
-    it "uses the name provided by the :as option" do 
+    it "uses the name provided by the :as option" do
       execute_template_in_scope(scope) { object Gild::Test::TestObject.new, :as => :foo }
       scope.to_hash.should have_key('foo')
     end
@@ -66,13 +65,23 @@ describe Gild::RenderContext do
     end
 
     it "executes the provided block in the context of the template" do
-      execute_template_in_scope(scope) { object(:foo) { @executed_in = self } }
+      execute_template_in_scope(scope) { object(Gild::Test::TestObject.new) { @executed_in = self } }
       scope.instance_variable_get(:"@executed_in").should == scope
     end
 
     it "yields the supplied object to the block" do
-      execute_template_in_scope(scope) { object(:thing) { |o| @yielded = o } }
-      scope.instance_variable_get(:"@yielded").should == :thing
+      execute_template_in_scope(scope) { object(Gild::Test::TestObject.new) { |o| @yielded = o } }
+      scope.instance_variable_get(:"@yielded").should be_a(Gild::Test::TestObject)
+    end
+
+    context "symbol specified" do
+      it "delegates to the object specified by the symbol" do
+        execute_template_in_scope(scope) do
+          object Gild::Test::TestObject.new do
+            object(:qux) { |qux| qux.should == 'qux' }
+          end
+        end
+      end
     end
   end
 
@@ -105,19 +114,19 @@ describe Gild::RenderContext do
 
   describe "rendering an array of objects" do
     it "derives the object name from the first object's type" do
-      execute_template_in_scope(scope) { array([Gild::Test::TestObject.new]) { } }
+      execute_template_in_scope(scope) { array([Gild::Test::TestObject.new]) {} }
       scope.to_hash.should have_key('test_objects')
     end
 
     it "uses the name provided by the :as option" do
-       execute_template_in_scope(scope) { array([Gild::Test::TestObject.new], :as => 'objects') { } }
-       scope.to_hash.should have_key('objects')
+      execute_template_in_scope(scope) { array([Gild::Test::TestObject.new], :as => 'objects') {} }
+      scope.to_hash.should have_key('objects')
     end
 
     it "delegates to attributes once for each object in the array if :attribtues is specified" do
       scope.should_receive(:attributes).with(:foo).twice
       execute_template_in_scope(scope) do
-        array([Gild::Test::TestObject.new, Gild::Test::TestObject.new], :attributes => :foo) { }
+        array([Gild::Test::TestObject.new, Gild::Test::TestObject.new], :attributes => :foo) {}
       end
     end
 
@@ -128,6 +137,16 @@ describe Gild::RenderContext do
         end
       end
       scope.instance_variable_get("@call_count").should == 2
+    end
+
+    context "symbol specified" do
+      it "delegates to the array specified by the symbol" do
+        execute_template_in_scope(scope) do
+          object Gild::Test::TestObject.new do
+            array(:bazzes) { |baz| baz.should == :baz }
+          end
+        end
+      end
     end
   end
 

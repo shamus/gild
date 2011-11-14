@@ -28,7 +28,7 @@ module Gild
 
     def object(context, options = {}, &b)
       name = Gild.gilded_name(options[:as] || context)
-      stack.current_hash[name] = constuct_object(context, {}, options, &b)
+      stack.current_hash[name] = constuct_object(retrieve_context(context), {}, options, &b)
     end
 
     def attributes(names)
@@ -47,7 +47,7 @@ module Gild
     def array(array, options = {}, &b)
       name = Gild.gilded_name(options[:as] || array)
       stack.current_hash[name] = [].tap do |objects|
-        array.each do |c|
+        retrieve_context(array).each do |c|
           objects << constuct_object(c, {}, options, &b) 
         end
       end
@@ -62,6 +62,10 @@ module Gild
     end
 
     private
+
+    def retrieve_context(context)
+      context.is_a?(Symbol) ? stack.current_object.send(context) : context
+    end
 
     def stack
       @_stack ||= Stack.new.tap do |s| 

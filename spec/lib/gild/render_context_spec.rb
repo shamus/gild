@@ -6,6 +6,7 @@ module Gild
     class TestObject
       def foo; :foo; end
       def bar; :bar; end
+      def things; [:foo, :bar]; end
     end
 
     class IncludedBuilder < Gild::Builder
@@ -104,9 +105,25 @@ describe Gild::RenderContext do
   end
 
   describe "rendering an array of objects" do
-    it "derives the object name from the first object's type" do
-      execute_template_in_scope(scope) { array([Gild::Test::TestObject.new]) { } }
-      scope.to_hash.should have_key('test_objects')
+    context "when a symbol is provided" do
+      before do
+        test_object = Gild::Test::TestObject.new
+        test_object.should_receive(:things).once.and_return([])
+        execute_template_in_scope(scope) do
+          object(test_object) { array(:things) {} }
+        end
+      end
+
+      it "uses it as the name" do
+        scope.to_hash['test_object'].should have_key('things')
+      end
+    end
+
+    context "when an array is provided" do
+      it "derives the object name from the first object's type" do
+        execute_template_in_scope(scope) { array([Gild::Test::TestObject.new]) { } }
+        scope.to_hash.should have_key('test_objects')
+      end
     end
 
     it "uses the name provided by the :as option" do

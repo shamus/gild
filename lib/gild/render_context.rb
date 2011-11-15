@@ -31,6 +31,10 @@ module Gild
       stack.current_hash[name] = constuct_object(context, {}, options, &b)
     end
 
+    def child(symbol, options = {}, &b)
+      object(stack.current_object.send(symbol), options, &b)
+    end
+
     def attributes(names)
       Array(names).each { |a| attribute(a) }
     end

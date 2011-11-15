@@ -77,6 +77,13 @@ describe Gild::RenderContext do
     end
   end
 
+  describe "rendering a child" do 
+    it "delegates to object" do 
+      scope.should_receive(:object).with(:foo, :as => :child)
+      execute_template_in_scope(scope_with_initial_context) { child(:foo, :as => :child) {} }
+    end
+  end
+
   describe "rendering a set of attributes" do
     it "delegates to attribute to render each speficied attribute" do
       scope.should_receive(:attribute).with(:foo)

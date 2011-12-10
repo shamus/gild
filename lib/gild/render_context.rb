@@ -35,8 +35,8 @@ module Gild
       object(stack.current_object.send(symbol), options, &b)
     end
 
-    def attributes(names)
-      Array(names).each { |a| attribute(a) }
+    def attributes(*names)
+      Array(names.flatten.compact).each { |a| attribute(a) }
     end
 
     def attribute(name)

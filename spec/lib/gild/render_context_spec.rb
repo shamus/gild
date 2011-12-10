@@ -88,7 +88,7 @@ describe Gild::RenderContext do
     it "delegates to attribute to render each speficied attribute" do
       scope.should_receive(:attribute).with(:foo)
       scope.should_receive(:attribute).with(:bar)
-      execute_template_in_scope(scope_with_initial_context) { attributes [:foo, :bar] }
+      execute_template_in_scope(scope_with_initial_context) { attributes :foo, :bar }
     end
   end
 

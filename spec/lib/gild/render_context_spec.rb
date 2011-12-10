@@ -7,6 +7,7 @@ module Gild
       def foo; :foo; end
       def bar; :bar; end
       def things; [:foo, :bar]; end
+      def attributes; { "foo" => foo, "bar" => bar }; end
     end
 
     class IncludedBuilder < Gild::Builder
@@ -89,6 +90,12 @@ describe Gild::RenderContext do
       scope.should_receive(:attribute).with(:foo)
       scope.should_receive(:attribute).with(:bar)
       execute_template_in_scope(scope_with_initial_context) { attributes :foo, :bar }
+    end
+
+    it "accepts an :all option" do
+      scope.should_receive(:attribute).with("foo")
+      scope.should_receive(:attribute).with("bar")
+      execute_template_in_scope(scope_with_initial_context) { attributes :all }
     end
   end
 

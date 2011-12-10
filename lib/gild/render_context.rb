@@ -36,6 +36,7 @@ module Gild
     end
 
     def attributes(*names)
+      names = stack.current_object.attributes.keys if names == [:all]
       Array(names.flatten.compact).each { |a| attribute(a) }
     end
 

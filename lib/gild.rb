@@ -4,6 +4,7 @@ require 'gild/template'
 require 'gild/template_builder'
 require 'gild/version'
 
+require 'extensions/object.rb'
 require 'extensions/string.rb'
 require 'multi_json'
 

@@ -138,6 +138,11 @@ describe Gild::RenderContext do
        scope.to_hash.should have_key('objects')
     end
 
+    it "is resilient to nil" do
+       execute_template_in_scope(scope) { array(nil, :as => 'objects') { } }
+       scope.to_hash.should have_key('objects')
+    end
+
     it "delegates to attributes once for each object in the array if :attribtues is specified" do
       scope.should_receive(:attributes).with(:foo).twice
       execute_template_in_scope(scope) do

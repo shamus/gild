@@ -50,7 +50,7 @@ module Gild
 
     def array(array, options = {}, &b)
       name = Gild.gilded_name(options[:as] || array)
-      array = array.is_a?(Symbol) ? stack.current_object.send(array) : array
+      array = array.is_a?(Symbol) ? stack.current_object.send(array) : array.to_a
       stack.current_hash[name] = [].tap do |objects|
         array.each { |c| objects << constuct_object(c, {}, options, &b) }
       end
